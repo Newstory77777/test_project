@@ -3,8 +3,9 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
+use Illuminate\Support\Facades\Http;
+
 
 class MainController extends Controller
 {
@@ -20,6 +21,8 @@ class MainController extends Controller
     {
         $companies = json_decode(file_get_contents(storage_path() . "/companies.json"), true);
         $symbols = array_column($companies, 'Symbol');
+        ///!!!!!!!!!!!()
+        /// Why we do not use date info into next request?
         $data = request()->validate([
             'symbol' => ['required',
                 Rule::in($symbols),
@@ -33,8 +36,27 @@ class MainController extends Controller
             ]);
         //We get data here
         //1)Send request and show table
+        $rapidApiUrl = 'https://yh-finance.p.rapidapi.com/stock/v3/get-historical-data';
+        $rapidApiHeaders = [
+            'X-RapidAPI-Key' => '',
+            'X-RapidAPI-Host' => ''
+        ];
+        $pendingRequest = Http::withHeaders($rapidApiHeaders);
+        $response = $pendingRequest->get($rapidApiUrl, ['symbol' => $data['symbol']]);
+
+        //if ($response->successful())
+        $result = $response->json();
+        $prices = $result['prices'] ?? array();
+
+        $prices = array_map(function ($price) {
+            $price['format_date'] = date('Y-m-d H:i', $price['date']);
+            return $price;
+        }, $prices);
+
         //2)Build chart
         //3)Send letter
-        dd($data);
+
+        return view('show', compact('prices'));
+
     }
 }
