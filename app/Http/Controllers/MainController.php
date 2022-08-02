@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Mail\CompanyMail;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\Http;
 
@@ -20,10 +22,10 @@ class MainController extends Controller
     public function show(Request $request)
     {
         $companies = json_decode(file_get_contents(storage_path() . "/companies.json"), true);
-        $symbols = array_column($companies, 'Symbol');
-        ///!!!!!!!!!!!()
-        /// Why we do not use date info into next request?
-        $data = request()->validate([
+        $symbolsAndCompanies = array_column($companies, 'Company Name','Symbol');
+        $symbols = array_keys($symbolsAndCompanies);
+
+        $data = $request->validate([
             'symbol' => ['required',
                 Rule::in($symbols),
             ],
@@ -34,6 +36,7 @@ class MainController extends Controller
             [
                 'symbol.in' => 'country symbol value is not valid'
             ]);
+
         //We get data here
         //1)Send request and show table
         $rapidApiUrl = 'https://yh-finance.p.rapidapi.com/stock/v3/get-historical-data';
@@ -55,6 +58,15 @@ class MainController extends Controller
 
         //2)Build chart
         //3)Send letter
+        Mail::to($data['email'])
+            ->send(new CompanyMail(
+                    [
+                        'start_date' => $data['start_date'],
+                        'end_date' => $data['end_date'],
+                        'company' => $symbolsAndCompanies[$data['symbol']]
+                    ]
+                )
+            );
 
         return view('show', compact('prices'));
 
