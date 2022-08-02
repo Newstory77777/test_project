@@ -38,8 +38,8 @@ class MainController extends Controller
         //1)Send request and show table
         $rapidApiUrl = 'https://yh-finance.p.rapidapi.com/stock/v3/get-historical-data';
         $rapidApiHeaders = [
-            'X-RapidAPI-Key' => '',
-            'X-RapidAPI-Host' => ''
+            'X-RapidAPI-Key' => env('X_RAPIDAPI_KEY'),
+            'X-RapidAPI-Host' => env('X_RAPIDAPI_HOST')
         ];
         $pendingRequest = Http::withHeaders($rapidApiHeaders);
         $response = $pendingRequest->get($rapidApiUrl, ['symbol' => $data['symbol']]);
