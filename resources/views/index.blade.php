@@ -51,9 +51,13 @@
         <button type="submit" class="btn btn-primary">Submit</button>
     </form>
     <script type="text/javascript">
-        $(function() {
-            $('#start_date_datepicker').datepicker();
-            $('#end_date_datepicker').datepicker();
+        $(function () {
+            $('#start_date_datepicker').datepicker({
+                format: 'yyyy-mm-dd'
+            });
+            $('#end_date_datepicker').datepicker({
+                format: 'yyyy-mm-dd'
+            });
         });
     </script>
 @endsection

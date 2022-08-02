@@ -1,5 +1,16 @@
 @extends('layouts.show')
 @section('content')
+    <div class="row"><h3>{{$mailMessage}}</h3></div>
+    <div class="row">
+        <div class="col-md-10 col-md-offset-1">
+            <div class="panel panel-default">
+                <div class="panel-heading"><b>Historical data</b></div>
+                <div class="panel-body">
+                    <canvas id="canvas" height="280" width="600"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
     <table class="table">
         <thead>
         <tr>
@@ -24,16 +35,6 @@
         @endforeach
         </tbody>
     </table>
-    <div class="row">
-        <div class="col-md-10 col-md-offset-1">
-            <div class="panel panel-default">
-                <div class="panel-heading"><b>Charts</b></div>
-                <div class="panel-body">
-                    <canvas id="canvas" height="280" width="600"></canvas>
-                </div>
-            </div>
-        </div>
-    </div>
 
     <script>
         var Dates = new Array();
@@ -54,7 +55,7 @@
                     datasets: [{
                         label: 'Open price',
                         data: Opens,
-                        borderColor: "#de4f54"
+                        borderColor: "red"
                     }, {
                         label: 'Close price',
                         data: Closes,
@@ -74,5 +75,4 @@
             });
         });
     </script>
-
 @endsection

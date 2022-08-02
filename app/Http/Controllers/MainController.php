@@ -22,15 +22,15 @@ class MainController extends Controller
     public function show(Request $request)
     {
         $companies = json_decode(file_get_contents(storage_path() . "/companies.json"), true);
-        $symbolsAndCompanies = array_column($companies, 'Company Name','Symbol');
+        $symbolsAndCompanies = array_column($companies, 'Company Name', 'Symbol');
         $symbols = array_keys($symbolsAndCompanies);
 
         $data = $request->validate([
             'symbol' => ['required',
                 Rule::in($symbols),
             ],
-            'start_date' => ['required', 'date_format:m/d/Y', 'before_or_equal:end_date', 'before_or_equal:today'],
-            'end_date' => ['required', 'date_format:m/d/Y', 'after_or_equal:end_date', 'before_or_equal:today'],
+            'start_date' => ['required', 'date_format:Y-m-d', 'before_or_equal:end_date', 'before_or_equal:today'],
+            'end_date' => ['required', 'date_format:Y-m-d', 'after_or_equal:end_date', 'before_or_equal:today'],
             'email' => 'required|email',
         ],
             [
@@ -58,17 +58,22 @@ class MainController extends Controller
 
         //2)Build chart
         //3)Send letter
-        Mail::to($data['email'])
-            ->send(new CompanyMail(
-                    [
-                        'start_date' => $data['start_date'],
-                        'end_date' => $data['end_date'],
-                        'company' => $symbolsAndCompanies[$data['symbol']]
-                    ]
-                )
-            );
+        try {
+            Mail::to($data['email'])
+                ->send(new CompanyMail(
+                        [
+                            'start_date' => $data['start_date'],
+                            'end_date' => $data['end_date'],
+                            'company' => $symbolsAndCompanies[$data['symbol']]
+                        ]
+                    )
+                );
+            $mailMessage = 'Mail to ' . $data['email'] . ' was sent. It can be checked at https://mailtrap.io';
+        } catch (Exception $e) {
+            $mailMessage = '';
+        }
 
-        return view('show', compact('prices'));
+        return view('show', compact('prices', 'mailMessage'));
 
     }
 }
