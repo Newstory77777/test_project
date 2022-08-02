@@ -24,14 +24,17 @@ class MainController extends Controller
             'symbol' => ['required',
                 Rule::in($symbols),
             ],
-            'start_date' => ['required', 'date_format:Y-m-d', 'before_or_equal:end_date', 'before_or_equal:today'],
-            'end_date' => ['required', 'date_format:Y-m-d', 'after_or_equal:end_date', 'before_or_equal:today'],
+            'start_date' => ['required', 'date_format:m/d/Y', 'before_or_equal:end_date', 'before_or_equal:today'],
+            'end_date' => ['required', 'date_format:m/d/Y', 'after_or_equal:end_date', 'before_or_equal:today'],
             'email' => 'required|email',
         ],
             [
                 'symbol.in' => 'country symbol value is not valid'
             ]);
-
+        //We get data here
+        //1)Send request and show table
+        //2)Build chart
+        //3)Send letter
         dd($data);
     }
 }
