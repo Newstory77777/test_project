@@ -15,3 +15,7 @@ use Illuminate\Support\Facades\Route;
 
 Route::get('/', 'MainController@index')->name('index');
 Route::post('/show', 'MainController@show')->name('show');
+Route::get('/show', function () {
+    return redirect('/');
+});
+
